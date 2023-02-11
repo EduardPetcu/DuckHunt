@@ -1,9 +1,8 @@
 #include "lab_m1/Tema1/Tema1.h"
 #include "lab_m1/Tema1/transform2D.h"
 #include "lab_m1/Tema1/object2D.h"
+#include "lab_m1/Tema1/Defines.h"
 
-const glm::vec3 LIME = glm::vec3(0.5f, 1, 0);
-const glm::vec3 BROWN = glm::vec3(0.54f, 0.269f, 0.074f);
 using namespace std;
 using namespace m1;
 
@@ -38,4 +37,14 @@ void Tema1::InitVariables() {
     killingSpree = 0;
     scoreMultiplier = 0;
     ducksOnScreen = 1;
+    barLength = 151;
+    barHeight = 25;
+    wireframeLength = 206;
+    bigDuckHP = 5;
+    BIG_DUCK = false;
+    colorBackground = DARK_BLUE;
+    for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
+        colorButton[i] = LIME;
+    }
+    flashTime = 0;
 }

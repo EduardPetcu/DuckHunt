@@ -5,38 +5,7 @@
 #include "core/engine.h"
 #include "utils/gl_utils.h"
 
-Mesh* object2D::CreateSquare(
-    const std::string& name,
-    glm::vec3 leftBottomCorner,
-    float length,
-    glm::vec3 color,
-    bool fill)
-{
-    glm::vec3 corner = leftBottomCorner;
 
-    std::vector<VertexFormat> vertices =
-    {
-        VertexFormat(corner, color),
-        VertexFormat(corner + glm::vec3(length, 0, 0), color),
-        VertexFormat(corner + glm::vec3(length, length, 0), color),
-        VertexFormat(corner + glm::vec3(0, length, 0), color)
-    };
-
-    Mesh* square = new Mesh(name);
-    std::vector<unsigned int> indices = { 0, 1, 2, 3 };
-
-    if (!fill) {
-        square->SetDrawMode(GL_LINE_LOOP);
-    }
-    else {
-        // Draw 2 triangles. Add the remaining 2 indices
-        indices.push_back(0);
-        indices.push_back(2);
-    }
-
-    square->InitFromData(vertices, indices);
-    return square;
-}
 
 Mesh* object2D::CreateRectangle(
     const std::string &name,
@@ -181,12 +150,32 @@ Mesh* object2D::CreateBar(
 
     Mesh* bar = new Mesh(name);
     std::vector<unsigned int> indices;
-    for (int i = 0; i < 8; ++i) {
-        indices.push_back(i);
-    }
-    //indices.push_back(0);
+    
     if (!fill) {
+        for (int i = 0; i < 8; ++i) {
+            indices.push_back(i);
+        }
         bar->SetDrawMode(GL_LINE_LOOP);
+    }
+    else {
+        int count = 0;
+        for (int i = 0; i < 8; ++i) {
+            indices.push_back(i);
+            if (count % 3 == 2) {
+                indices.push_back(i);
+                count++;
+            }   
+            count++;
+        }
+        indices.push_back(0);
+        for (int i = 0; i < 8; i += 2) {
+            indices.push_back(i);
+            if (i == 4) {
+                indices.push_back(i);
+            }
+        }
+        indices.push_back(0);
+        //bar->SetDrawMode(GL_TRIANGLES);
     }
 
     bar->InitFromData(vertices, indices);
@@ -205,10 +194,6 @@ Mesh* object2D::CreateDiamond(
 {
     glm::vec3 corner = center;
     std::vector<VertexFormat> vertices;
-    //color2 = color;
-    //color2.y /= 2;
-    //color3 = color;
-    //color3.y = 0;
     vertices.push_back(VertexFormat(corner, color)); // 0
     vertices.push_back(VertexFormat(corner + glm::vec3(length, length, 0), color)); // 1
     vertices.push_back(VertexFormat(corner + glm::vec3(length2, -length2, 0), color)); // 2
