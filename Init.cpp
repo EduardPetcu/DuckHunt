@@ -34,6 +34,7 @@ void Tema1::InitVariables() {
     nrOfDucks = 0;
     numberOfLifes = 3;
     maxAmmo = 3;
+    score = 0;
     killingSpree = 0;
     scoreMultiplier = 0;
     ducksOnScreen = 1;
@@ -46,5 +47,8 @@ void Tema1::InitVariables() {
     for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
         colorButton[i] = LIME;
     }
+    buttonName[0] = "QUIT";
+    buttonName[1] = "STATS";
+    buttonName[2] = "START";
     flashTime = 0;
 }

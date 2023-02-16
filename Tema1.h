@@ -1,6 +1,8 @@
 #pragma once
 
 #include "components/simple_scene.h"
+#include "components/text_renderer.h"
+
 #define MAX_DUCKS 6
 #define NUMBER_OF_BUTTONS 3
 namespace m1
@@ -48,9 +50,15 @@ namespace m1
         void OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods) override;
         void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
         void OnWindowResize(int width, int height) override;
+        void updateStats();
         void startingWindow();
         void checkButtonType();
      protected:
+        gfxc::TextRenderer* textRenderer;
+        GLenum polygonMode = GL_FILL;
+        const glm::vec3 kTextColor = NormalizedRGB(166, 172, 205);
+        const glm::vec3 kBackgroundColor = NormalizedRGB(41, 45, 62);
+
         float cx, cy;
         bool flyAway = false, freezeTime = false, BIG_DUCK;
         bool deadDuck[MAX_DUCKS] = {false};
@@ -74,5 +82,6 @@ namespace m1
         int numberOfLifes, Ammo, nrOfDucks, maxAmmo, randomAngle, scalingFactor = 25;
         int score, killingSpree, scoreMultiplier, duckCounter, ducksOnScreen, bigDuckHP, ducksOnScreenCopy;
         bool isStarting = true;
+        std::string buttonName[NUMBER_OF_BUTTONS];
     };
 }   // namespace m1
