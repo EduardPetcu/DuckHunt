@@ -1,1 +1,5 @@
-highscore = 350
+highscore = 900
+ducks_killed_last_round = 12
+total_ducks_killed = 17
+time_spent_last_round = 69.3
+total_time_spent = 104.4

@@ -50,6 +50,7 @@ namespace m1
         void OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods) override;
         void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
         void OnWindowResize(int width, int height) override;
+        void initStats();
         void updateStats();
         void startingWindow();
         void checkButtonType();
@@ -69,19 +70,20 @@ namespace m1
         float scaleX, scaleY, bonusX, bonusY;
         float angleTurn[MAX_DUCKS];
         const float MOUSE_SPEED = 0.85f;
-        float posXCursor = 250, posYCursor = 250, posZBox = 0;
-        float diamondLength1 = 12.5, diamondLength2 = 25;
-        float rotationWings = 0;
-        bool changeWingDirection = false;
+        float posXCursor, posYCursor;
+        float diamondLength1, diamondLength2;
+        float rotationWings;
+        bool changeWingDirection;
         float posHeadX[MAX_DUCKS], posHeadY[MAX_DUCKS];
         float triangleSide, circleRadius, grassHeight, dirtHeight, barLength, barHeight, wireframeLength;
-        float timeDuck = 0, slowTime = 0 , lastBounce = 0, changeDirection = 0, flashTime;
-        float duckSpeed = 140, wingSpeed = 2.8f, reducedSpeed = 50.0f, wingTurnTime = 0.4f;
-        int posXBossBar = 300, posYBossBar = 670;
-        float edgeBodyX, edgeBodyY, edgeWingX, edgeWingY, timeOnScreen = 8.0f, bossBarScaling = 3.05f;
-        int numberOfLifes, Ammo, nrOfDucks, maxAmmo, randomAngle, scalingFactor = 25;
-        int score, killingSpree, scoreMultiplier, duckCounter, ducksOnScreen, bigDuckHP, ducksOnScreenCopy;
-        bool isStarting = true;
+        float timeDuck, slowTime, lastBounce, changeDirection, flashTime, timeSpent, timeOnScreen;
+        float duckSpeed, wingSpeed, reducedSpeed, wingTurnTime;
+        int posXBossBar, posYBossBar, scalingFactor; // (scalingFactor is for boss health bar)
+        float edgeBodyX, edgeBodyY, edgeWingX, edgeWingY, bossBarScaling;
+        int numberOfLifes, Ammo, nrOfDucks, maxAmmo, randomAngle;
+        int duck_counter;
+        int score, highscore, killingSpree, scoreMultiplier, ducksOnScreen, bigDuckHP, ducksOnScreenCopy;
+        bool isStarting;
         std::string buttonName[NUMBER_OF_BUTTONS];
     };
 }   // namespace m1

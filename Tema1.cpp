@@ -26,14 +26,14 @@ Tema1::~Tema1()
 }
 // DONE: implementat text for score
 // DONE: save highscore in a notepad 
-// TODO: print the highscore on the screen (easy task)
+// DONE: print the highscore on the screen (easy task)
 // TODO: save other stats too
-// TODO: 3 - 4 buttons: 1 -> Start ; 2 -> Stats ; 3 (optional - HARD) -> Settings ; 4 -> Quit 
+// TODO: 3 - 4 buttons: 1 -> Start ; 2 -> Stats ; 3 (optional - HARD) -> Shop ; 4 (optional - HARD) -> Settings; 5 -> Quit 
 // TODO: special animation for duck death
 // TODO: end-game screen for win/lose
-// TODO: divide Tema1.cpp into multiple p
+// TODO: divide Tema1.cpp into multiple .cpp files
 // TODO: ducks that gives you bonus points / x2 multiplier
-// TODO: resolve any bug caused by glDisable(GL_DEPTH_TEST);
+// TODO: resolve any bug caused by glDisable(GL_DEPTH_TEST); 
 // BUG: After finishing a DuckHunt game, the Start button doesn't work (all variables need to be reinitialized)
 // BUG:  max-speed ducks crash their head in the corners (sometimes)
 void Tema1::FrameStart()
@@ -132,6 +132,7 @@ void Tema1::Init()
     srand(time(NULL));
     textRenderer = new gfxc::TextRenderer(window->props.selfDir, resolution.x, resolution.y);
     textRenderer->Load(PATH_JOIN(window->props.selfDir, RESOURCE_PATH::FONTS, "Hack-Bold.ttf"), 18);
+    initStats();
     InitVariables();
     CreateMeshes();
 
@@ -170,8 +171,11 @@ void Tema1::RenderBackground() {
     modelMatrix *= transform2D::Translate(50, marginY - 151);
     RenderMesh2D(meshes["bar"], shaders["VertexColor"], modelMatrix);
 
-    string scorePrint = "SCORE: " + to_string(score);
-    textRenderer->RenderText(scorePrint, 3 * marginX / 4, marginY - 50, 2.0f, WHITE);
+    string scorePrint = "SCORE : " + to_string(score);
+    textRenderer->RenderText(scorePrint, 3 * marginX / 4, marginY - 100, 1.5f, WHITE);
+
+    string highscorePrint = "HIGHSCORE : " + to_string(highscore);
+    textRenderer->RenderText(highscorePrint, 3 * marginX / 4, marginY - 50, 1.5f, WHITE);
 }
 void Tema1::WingAnimation(float deltaTimeSeconds) {
     if (rotationWings >= wingTurnTime) {
@@ -251,46 +255,6 @@ void Tema1::DuckAnimation(float deltaTimeSeconds) {
         modelMatrix *= transform2D::Translate(-cx, -cy);
         RenderMesh2D(meshes["triangle4"], shaders["VertexColor"], modelMatrix);
     }
-}
-void Tema1::CheckUpperMargin(float timeD) {
-
-    // MARGINE SUS
-    for (int i = 0; i < ducksOnScreen; ++i) {
-        if (posHeadY[i] + circleRadius > marginY) {
-            angleTurn[i] = 2 * PI - angleTurn[i];
-            lastBounce = timeD;
-        }
-    }
-}
-void Tema1::CheckMargins(float timeD) {
-
-    if (timeD - lastBounce < EPS)
-        return;
-    if (!flyAway) {
-        CheckUpperMargin(timeD);
-    }
-    // MARGINE DREAPTA
-    for (int i = 0; i < ducksOnScreen; ++i) {
-        if (posHeadX[i] + circleRadius > marginX) {
-            angleTurn[i] = PI - angleTurn[i];
-            lastBounce = timeD;
-        }
-    }
-    // MARGINE STANGA
-    for (int i = 0; i < ducksOnScreen; ++i) {
-        if (posHeadX[i] < 0) {
-            angleTurn[i] = PI - angleTurn[i];
-            lastBounce = timeD;
-        }
-    }
-    // MARGINE JOS
-    for (int i = 0; i < ducksOnScreen; ++i) {
-        if (posHeadY[i] - circleRadius < 0) {
-            angleTurn[i] = 2 * PI - angleTurn[i];
-            lastBounce = timeD;
-        }
-    }
-
 }
 bool Tema1::CheckAllDucks() {
     for (int i = 0; i < ducksOnScreen; ++i) {
@@ -542,42 +506,23 @@ void Tema1::BossFightHealthBar() {
     modelMatrix *= transform2D::Scale(bossBarScaling - 0.01, 0.5);
     RenderMesh2D(meshes["wireframe"], modelMatrix, WHITE);
 } 
-void Tema1::updateStats() {
-    FILE *stats_file, *stats_file_write;
-    string filename = PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "Tema1", "stats.txt");
-    string filename_write = PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "Tema1", "stats");
-    stats_file = fopen(filename.c_str(), "r");
-    stats_file_write = fopen(filename_write.c_str(), "w");
-    /*ifstream fin(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "Tema1", "stats.txt"));
-    ofstream fout(PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "Tema1", "stats"));*/
-    fseek(stats_file, 12, SEEK_SET);
-    int score_printed = 0;
-    //fin >> score_printed;
-    fscanf(stats_file, "%d", &score_printed);
-    if (score > score_printed) {
-        fputs("highscore = ", stats_file_write);
-        fprintf(stats_file_write, "%d\n", score);
-    }
-    else {
-        fputs("highscore = ", stats_file_write);
-        fprintf(stats_file_write, "%d\n", score_printed);
-    }
-    fclose(stats_file);
-    fclose(stats_file_write);
-    std::remove(filename.c_str());
-    std::rename(filename_write.c_str(), filename.c_str());
-}
 void Tema1::Update(float deltaTimeSeconds)
 {
     if (isStarting) {
         startingWindow();
         return;
     }
+    if (numberOfLifes <= 0 || ducksOnScreen == 5) {
+        updateStats();
+        InitVariables();
+        return;
+    }
     if (flashTime <= 0)
         colorBackground = DARK_BLUE;
     else
         flashTime -= deltaTimeSeconds;
-    glm::ivec2 resolution = window->GetResolution();
+    //glm::ivec2 resolution = window->GetResolution();
+    timeSpent += deltaTimeSeconds;
     timeDuck += deltaTimeSeconds;
     slowTime -= deltaTimeSeconds;
     changeDirection += deltaTimeSeconds;
@@ -587,11 +532,6 @@ void Tema1::Update(float deltaTimeSeconds)
     }
     
     CheckKillingSpree(timeDuck);
-    if (numberOfLifes <= 0 || ducksOnScreen == 5) {
-        updateStats();
-        isStarting = true;
-        return;
-    }
     RandomMovement(deltaTimeSeconds);
     if (fabs(timeDuck - 2.0f) < EPS) {
         NewDucks();
@@ -651,6 +591,7 @@ void Tema1::Update(float deltaTimeSeconds)
 
 void Tema1::FrameEnd()
 {
+
 }
 
 
@@ -683,12 +624,6 @@ void Tema1::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
     posXCursor = (double) mouseX / (resolution.x / marginX);
     posYCursor = (double) (marginY - mouseY / (resolution.y / marginY));
 
-    //modelMatrix = glm::mat3(1);
-    //modelMatrix *= transform2D::Translate(marginX / 2 - 452 / 2, marginY - i * marginY / NUMBER_OF_BUTTONS - 50);
-    //// 151 * 3 ; 25 * 3; 
-    //modelMatrix *= transform2D::Scale(3, 3);
-    //RenderMesh2D(meshes["button"], modelMatrix, colorButton[i]);
-
     for (int i = 0; i < NUMBER_OF_BUTTONS; ++i) {
         if (isStarting && posXCursor > (marginX / 2 - 226) && posXCursor < (marginX / 2 - 226) + 453 &&
             posYCursor < (marginY - i * marginY / NUMBER_OF_BUTTONS - 50) && posYCursor > (marginY - i * marginY / NUMBER_OF_BUTTONS - 125))
@@ -705,50 +640,7 @@ void Tema1::checkButtonType() {
         this->Exit();
     }
 }
-void Tema1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
-{
-    for (int i = 0; i < NUMBER_OF_BUTTONS; ++i) {
-        if (colorButton[i] == GREEN)
-            checkButtonType();
-    }
-    if (Ammo <= 0)
-        return;
-    Ammo--;
-    for (int i = 0; i < ducksOnScreen; ++i) {
-        if ((posXCursor > posHeadX[i] - circleRadius && posXCursor < posHeadX[i] + circleRadius &&
-            posYCursor > posHeadY[i] - circleRadius && posYCursor < posHeadY[i] + circleRadius)) {
-            colorBackground = CRIMSON;
-            flashTime = FLASH_TIME_LIMIT;
-            if (BIG_DUCK) {
-                bigDuckHP = bigDuckHP - BOSS_HEADSHOT_DAMAGE;
-            }
-            else {
-                deadDuck[i] = true;
-                score = score + 50;
-            }
-            return;
-        }   
-        if (((posXCursor >= posHeadX[i] - triangleSide / 2 - (2 * triangleSide) * cos(angleTurn[i]) && posXCursor <= posHeadX[i]) ||
-            (posXCursor <= posHeadX[i] + triangleSide / 2 - (2 * triangleSide) * cos(angleTurn[i]) && posXCursor >= posHeadX[i])) &&
-            ((posYCursor >= posHeadY[i] - triangleSide / 2 - (2 * triangleSide) * sin(angleTurn[i]) && posYCursor <= posHeadY[i]) ||
-            (posYCursor <= posHeadY[i] + triangleSide / 2 - (2 * triangleSide) * sin(angleTurn[i]) && posYCursor >= posHeadY[i]))) {
-            colorBackground = CRIMSON;
-            flashTime = FLASH_TIME_LIMIT;
-            if (BIG_DUCK) {
-                bigDuckHP = bigDuckHP - BOSS_BODYSHOT_DAMAGE;
-            }
-            else {
-                deadDuck[i] = true;
-                score = score + 50;
-            } 
-            return;
-        }
-    }
-    //flashTime = FLASH_TIME_LIMIT;
-    //colorBackground = WHITE;
-}
     
-
 void Tema1::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button release event
