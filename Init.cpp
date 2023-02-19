@@ -8,8 +8,8 @@ using namespace m1;
 
 void Tema1::InitVariables() {
     isStarting = true;
+    isStats = false;
     glm::ivec2 resolution = window->GetResolution();
-    glm::vec3 corner = glm::vec3(0, 0, 0);
     colorLevel = LIME;
     posXCursor = 250, posYCursor = 250;
     triangleSide = 75;
@@ -17,18 +17,16 @@ void Tema1::InitVariables() {
     grassHeight = 45;
     dirtHeight = 75;
     diamondLength1 = 12.5, diamondLength2 = 25;
-    cx = corner.x;
-    cy = corner.y;
+    cx = 0;
+    cy = 0;
     marginX = resolution.x;
     marginY = resolution.y;
-    edgeBodyX = corner.x + 2 * triangleSide;
-    edgeBodyY = corner.y + triangleSide / 2;
-    edgeWingX = corner.x + 2 * triangleSide / 3;
-    edgeWingY = corner.y + triangleSide / 6;
+    edgeBodyX =  2 * triangleSide;
+    edgeBodyY =  triangleSide / 2;
+    edgeWingX =  2 * triangleSide / 3;
+    edgeWingY =  triangleSide / 6;
     translateX = 0;
     translateY = 0;
-    bonusX = 0;
-    bonusY = 0;
     scaleX = 1;
     scaleY = 1;
     numberOfLifes = 3;
@@ -54,18 +52,20 @@ void Tema1::InitVariables() {
     bossBarScaling = 3.05f;
     scalingFactor = 25;
 
-    duckSpeed = 140;
-    wingSpeed = 2.8f;
-    reducedSpeed = 50.0f;
-    wingTurnTime = 0.4f;
+    initSpeedVariables();
 
     for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
         colorButton[i] = LIME;
     }
+    colorBackButton = LIME;
     buttonName[0] = "QUIT";
     buttonName[1] = "STATS";
     buttonName[2] = "START";
 
+    initTimeVariables();
+}
+
+void Tema1::initTimeVariables() {
     timeOnScreen = 8.0f;
     flashTime = 0;
     timeDuck = 0;
@@ -73,4 +73,11 @@ void Tema1::InitVariables() {
     lastBounce = 0;
     changeDirection = 0;
     timeSpent = 0;
+}
+
+void Tema1::initSpeedVariables() {
+    duckSpeed = 140;
+    wingSpeed = 2.8f;
+    reducedSpeed = 50.0f;
+    wingTurnTime = 0.4f;
 }

@@ -5,6 +5,7 @@
 
 #define MAX_DUCKS 6
 #define NUMBER_OF_BUTTONS 3
+#define NUMBER_OF_STATS   5
 namespace m1
 {
     class Tema1 : public gfxc::SimpleScene
@@ -51,8 +52,12 @@ namespace m1
         void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
         void OnWindowResize(int width, int height) override;
         void initStats();
+        void initTimeVariables();
+        void initSpeedVariables();
         void updateStats();
+        void renderStats();
         void startingWindow();
+        void statsWindow();
         void checkButtonType();
      protected:
         gfxc::TextRenderer* textRenderer;
@@ -64,7 +69,7 @@ namespace m1
         bool flyAway = false, freezeTime = false, BIG_DUCK;
         bool deadDuck[MAX_DUCKS] = {false};
         glm::mat3 modelMatrix;
-        glm::vec3 color[MAX_DUCKS], colorLevel, colorBackground, colorButton[NUMBER_OF_BUTTONS];
+        glm::vec3 color[MAX_DUCKS], colorLevel, colorBackground, colorButton[NUMBER_OF_BUTTONS], colorBackButton;
         int marginX, marginY;
         float translateX, translateY;
         float scaleX, scaleY, bonusX, bonusY;
@@ -83,7 +88,8 @@ namespace m1
         int numberOfLifes, Ammo, nrOfDucks, maxAmmo, randomAngle;
         int duck_counter;
         int score, highscore, killingSpree, scoreMultiplier, ducksOnScreen, bigDuckHP, ducksOnScreenCopy;
-        bool isStarting;
+        bool isStarting, isStats;
         std::string buttonName[NUMBER_OF_BUTTONS];
+        std::string textStatsToRender[NUMBER_OF_STATS];
     };
 }   // namespace m1

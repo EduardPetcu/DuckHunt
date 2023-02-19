@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+
 using namespace std;
 using namespace m1;
 // TODO: DE REPARAT fisierul de stats!
@@ -57,4 +58,34 @@ void Tema1::initStats() {
     fseek(stats_file, 12, SEEK_SET);
     fscanf(stats_file, "%d", &highscore);
     fclose(stats_file);
+}
+void Tema1::renderStats() {
+    FILE* stats_file;
+    string filename = PATH_JOIN(window->props.selfDir, SOURCE_PATH::M1, "Tema1", "stats.txt");
+    stats_file = fopen(filename.c_str(), "r");
+    char buffer[1000];
+    string textToRender;
+    int score_printed = 0;
+    float time_float = 0.0f;
+    for (int i = 0; i < 3; i++) {
+        fscanf(stats_file, "%s = %d\n", buffer, &score_printed);
+        textToRender = buffer;
+        textToRender += ": ";
+        textToRender += to_string(score_printed);
+        textStatsToRender[i] = textToRender;
+    }
+    for (int i = 3; i <= 4; i++) {
+        fscanf(stats_file, "%s = %f\n", buffer, &time_float);
+        textToRender = buffer;
+        textToRender += ": ";
+        stringstream stream;
+        stream.precision(1);
+        stream << fixed;
+        stream << time_float;
+        textToRender += stream.str();
+        textStatsToRender[i] = textToRender;
+        cout << textStatsToRender[i] << "\n";
+
+    }
+   
 }

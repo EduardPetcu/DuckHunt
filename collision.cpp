@@ -54,6 +54,10 @@ void Tema1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
         if (colorButton[i] == GREEN)
             checkButtonType();
     }
+    if (colorBackButton == GREEN) {
+        isStats = false;
+        isStarting = true;
+    }
     if (Ammo <= 0)
         return;
     Ammo--;

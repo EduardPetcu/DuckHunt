@@ -24,17 +24,15 @@ Tema1::Tema1()
 Tema1::~Tema1()
 {
 }
-// DONE: implementat text for score
-// DONE: save highscore in a notepad 
-// DONE: print the highscore on the screen (easy task)
 // TODO: save other stats too
 // TODO: 3 - 4 buttons: 1 -> Start ; 2 -> Stats ; 3 (optional - HARD) -> Shop ; 4 (optional - HARD) -> Settings; 5 -> Quit 
+// (this involves a different arrangement for the button -> it might require to have 2 columns of 3 buttons)
 // TODO: special animation for duck death
 // TODO: end-game screen for win/lose
 // TODO: divide Tema1.cpp into multiple .cpp files
 // TODO: ducks that gives you bonus points / x2 multiplier
 // TODO: resolve any bug caused by glDisable(GL_DEPTH_TEST); 
-// BUG: After finishing a DuckHunt game, the Start button doesn't work (all variables need to be reinitialized)
+// TODO: remove code/variables that are useless
 // BUG:  max-speed ducks crash their head in the corners (sometimes)
 void Tema1::FrameStart()
 {
@@ -98,14 +96,6 @@ void Tema1::CreateMeshes() {
 
 }
 void Tema1::startingWindow() {
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(posXCursor, posYCursor);
-    RenderMesh2D(meshes["targetCross"], shaders["VertexColor"], modelMatrix);
-
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform2D::Translate(posXCursor, posYCursor);
-    RenderMesh2D(meshes["target"], shaders["VertexColor"], modelMatrix);
-    
     for (int i = 0; i < NUMBER_OF_BUTTONS; ++i) {
         modelMatrix = glm::mat3(1);
         modelMatrix *= transform2D::Translate(marginX / 2 - 452 / 2, marginY - i * marginY / NUMBER_OF_BUTTONS - 50);
@@ -117,6 +107,31 @@ void Tema1::startingWindow() {
     for (int i = 0; i < NUMBER_OF_BUTTONS; ++i) {
         textRenderer->RenderText(buttonName[i], marginX / 2 - 15 * buttonName[i].length(), marginY - i * marginY / NUMBER_OF_BUTTONS - 175, 3.0f, kTextColor);
     }
+    modelMatrix = glm::mat3(1);
+    modelMatrix *= transform2D::Translate(posXCursor, posYCursor);
+    RenderMesh2D(meshes["targetCross"], shaders["VertexColor"], modelMatrix);
+
+    modelMatrix = glm::mat3(1);
+    modelMatrix *= transform2D::Translate(posXCursor, posYCursor);
+    RenderMesh2D(meshes["target"], shaders["VertexColor"], modelMatrix);
+}
+void Tema1::statsWindow() {
+    for (int i = 1; i <= NUMBER_OF_STATS; i++) {
+        textRenderer->RenderText(textStatsToRender[i - 1], marginX / 2 - 10 * textStatsToRender[i - 1].length(), 50 * i, 2.0f, WHITE);
+    }
+    modelMatrix = glm::mat3(1);
+    modelMatrix *= transform2D::Translate(marginX - marginX / 8 - 301, marginY / 8);
+    modelMatrix *= transform2D::Scale(2, 2);
+    RenderMesh2D(meshes["button"], modelMatrix, colorBackButton);
+    textRenderer->RenderText("Back", marginX - marginX / 4 - 10 * 4, marginY - marginY / 8, 2.5f, kTextColor);
+
+    modelMatrix = glm::mat3(1);
+    modelMatrix *= transform2D::Translate(posXCursor, posYCursor);
+    RenderMesh2D(meshes["targetCross"], shaders["VertexColor"], modelMatrix);
+
+    modelMatrix = glm::mat3(1);
+    modelMatrix *= transform2D::Translate(posXCursor, posYCursor);
+    RenderMesh2D(meshes["target"], shaders["VertexColor"], modelMatrix);
 }
 void Tema1::Init()
 {
@@ -177,85 +192,7 @@ void Tema1::RenderBackground() {
     string highscorePrint = "HIGHSCORE : " + to_string(highscore);
     textRenderer->RenderText(highscorePrint, 3 * marginX / 4, marginY - 50, 1.5f, WHITE);
 }
-void Tema1::WingAnimation(float deltaTimeSeconds) {
-    if (rotationWings >= wingTurnTime) {
-        changeWingDirection = true;
-    }
-    if (rotationWings <= -wingTurnTime) {
-        changeWingDirection = false;
-    }
-    if (changeWingDirection) {
-        rotationWings -= deltaTimeSeconds * wingSpeed;
-    }
-    else {
-        rotationWings += deltaTimeSeconds * wingSpeed;
-    }
-}
-void Tema1::DuckAnimation(float deltaTimeSeconds) {
 
-    // capu la rata
-    for (int i = 0; i < ducksOnScreen; ++i) {
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transform2D::Translate(posHeadX[i], posHeadY[i]);
-        if (BIG_DUCK) {
-            modelMatrix *= transform2D::Scale(2, 2);
-        }
-        RenderMesh2D(meshes["circle1"], shaders["VertexColor"], modelMatrix);
-
-        // corpu la rata
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transform2D::Translate(posHeadX[i] - circleRadius * cos(angleTurn[i]) - 2 * triangleSide,
-                                              posHeadY[i] - circleRadius * sin(angleTurn[i]) - triangleSide / 2);
-        if (BIG_DUCK) {
-            modelMatrix *= transform2D::Scale(2, 2);
-        }
-        modelMatrix *= transform2D::Translate(edgeBodyX, edgeBodyY);
-        modelMatrix *= transform2D::Rotate(angleTurn[i]);
-        modelMatrix *= transform2D::Translate(-edgeBodyX, -edgeBodyY);
-
-        RenderMesh2D(meshes["triangle1"], modelMatrix, color[i]);
-
-        WingAnimation(deltaTimeSeconds);
-
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transform2D::Translate(posHeadX[i] - (circleRadius + triangleSide - triangleSide / 6) * cos(angleTurn[i]),
-                                              posHeadY[i] - (circleRadius + triangleSide - triangleSide / 6) * sin(angleTurn[i]));
-        if (BIG_DUCK) {
-            modelMatrix *= transform2D::Scale(2, 2);
-        }
-        modelMatrix *= transform2D::Rotate(PI / 2 + angleTurn[i]);
-        modelMatrix *= transform2D::Translate(cx, cy);
-        modelMatrix *= transform2D::Rotate(rotationWings);
-        modelMatrix *= transform2D::Translate(-cx, -cy);
-
-        RenderMesh2D(meshes["triangle2"], modelMatrix, color[i]);
-
-        // aripa la rata
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transform2D::Translate(posHeadX[i] - (circleRadius + triangleSide + triangleSide / 6) * cos(angleTurn[i]),
-            posHeadY[i] - (circleRadius + triangleSide + triangleSide / 6) * sin(angleTurn[i]));
-        if (BIG_DUCK) {
-            modelMatrix *= transform2D::Scale(2, 2);
-        }
-        modelMatrix *= transform2D::Rotate(-PI / 2 + angleTurn[i]);
-        modelMatrix *= transform2D::Translate(cx, cy);
-        modelMatrix *= transform2D::Rotate(-rotationWings);
-        modelMatrix *= transform2D::Translate(-cx, -cy);
-        RenderMesh2D(meshes["triangle2"], modelMatrix, color[i]);
-
-        // ciocu la rata
-        modelMatrix = glm::mat3(1);
-        modelMatrix *= transform2D::Translate(posHeadX[i] + circleRadius * cos(angleTurn[i]), posHeadY[i] +
-                        circleRadius * sin(angleTurn[i]));
-        if (BIG_DUCK) {
-            modelMatrix *= transform2D::Scale(2, 2);
-        }
-        modelMatrix *= transform2D::Translate(cx, cy);
-        modelMatrix *= transform2D::Rotate(angleTurn[i]);
-        modelMatrix *= transform2D::Translate(-cx, -cy);
-        RenderMesh2D(meshes["triangle4"], shaders["VertexColor"], modelMatrix);
-    }
-}
 bool Tema1::CheckAllDucks() {
     for (int i = 0; i < ducksOnScreen; ++i) {
         if (!deadDuck[i] || posHeadY[i] > 0) {
@@ -512,6 +449,10 @@ void Tema1::Update(float deltaTimeSeconds)
         startingWindow();
         return;
     }
+    if (isStats) {
+        statsWindow();
+        return;
+    }
     if (numberOfLifes <= 0 || ducksOnScreen == 5) {
         updateStats();
         InitVariables();
@@ -521,7 +462,6 @@ void Tema1::Update(float deltaTimeSeconds)
         colorBackground = DARK_BLUE;
     else
         flashTime -= deltaTimeSeconds;
-    //glm::ivec2 resolution = window->GetResolution();
     timeSpent += deltaTimeSeconds;
     timeDuck += deltaTimeSeconds;
     slowTime -= deltaTimeSeconds;
@@ -631,10 +571,21 @@ void Tema1::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
         else
             colorButton[i] = LIME;
     }
+    //(marginX - marginX / 8 - 301, marginY / 8); 151 x 25
+    if (isStats && posXCursor > marginX - marginX / 8 - 301 && posXCursor < marginX - marginX / 8 &&
+        posYCursor > marginY / 8 - 50 && posYCursor < marginY / 8)
+        colorBackButton = GREEN;
+    else
+        colorBackButton = LIME;
 }
 void Tema1::checkButtonType() {
     if (colorButton[0] == GREEN) {
         isStarting = false;
+    }
+    if (colorButton[1] == GREEN) {
+        isStarting = false;
+        isStats = true;
+        renderStats();
     }
     if (colorButton[2] == GREEN) {
         this->Exit();
